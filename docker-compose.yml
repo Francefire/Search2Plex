@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+    volumes:
+      - ./plex-media/music:/data/music
+    networks:
+      - search2plex
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+        - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+        - VITE_BACKEND_URL=${VITE_BACKEND_URL}
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    # Note: Vite env vars are build-time, so we need to pass them as build args or 
+    # ensure they are available during the build process if using multi-stage builds.
+    # However, for runtime config in Nginx/React, we usually bake them in.
+    # For this simple setup, we assume the user will provide .env at build time.
+    networks:
+      - search2plex
+
+networks:
+  search2plex:
+    driver: bridge
