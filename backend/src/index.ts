@@ -8,7 +8,7 @@ import { processCSV } from './processor.js';
 import { requireAuth } from './auth.js';
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = parseInt(process.env.PORT || '3000', 10);
 
 app.use(cors());
 app.use(express.json());
@@ -48,6 +48,6 @@ app.post('/upload', requireAuth, upload.single('file'), (req, res) => {
     res.json({ message: 'File uploaded successfully. Processing started.' });
 });
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Server running on port ${port}`);
 });
